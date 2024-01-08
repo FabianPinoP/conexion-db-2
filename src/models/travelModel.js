@@ -2,12 +2,8 @@ import pool from "../../db/conectionDb.js";
 
 const getTravels = async () => {
   const SQLquery = { text: "SELECT * FROM viajes" };
-  try {
     const response = await pool.query(SQLquery);
     return response.rows;
-  } catch (error) {
-    console.log(error);
-  }
 };
 
 const createTravel = async ({ destino, presupuesto }) => {
@@ -15,12 +11,26 @@ const createTravel = async ({ destino, presupuesto }) => {
     text: "INSERT INTO viajes (destino, presupuesto) VALUES ($1, $2) RETURNING *",
     values: [destino, presupuesto],
   };
-  try {
     const response = await pool.query(SQLquery);
-    return response.rows;
-  } catch (error) {
-    console.log(error);
-  }
+    return response.rows[0];
 };
 
-export { getTravels, createTravel };
+const updateTravel = async (id, { presupuesto }) => {
+  const SQLquery = {
+    text: "UPDATE viajes SET presupuesto = $1 WHERE id = $2 RETURNING *",
+    values: [presupuesto, id],
+  };
+    const response = await pool.query(SQLquery);
+    return response.rows[0];
+}
+
+const destroyTravel = async (id) => {
+  const SQLquery = {
+    text: "DELETE FROM viajes WHERE id = $1",
+    values: [id],
+  };
+    const response = await pool.query(SQLquery);
+    return response.rowCount;
+};
+
+export { getTravels, createTravel, updateTravel, destroyTravel };
